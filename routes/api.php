@@ -19,3 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/videos/{video}', 'VideosController@get');
+Route::get('/videos', 'VideosController@index');
