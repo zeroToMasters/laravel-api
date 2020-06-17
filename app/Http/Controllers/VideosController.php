@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Dtos\VideoPreview;
 use App\Video;
 
 class VideosController extends Controller
@@ -13,6 +14,9 @@ class VideosController extends Controller
 
     public function index()
     {
-        return Video::orderBy('created_at', 'DESC')->get();
+        $videos = Video::orderBy('created_at', 'DESC')->get()
+            ->mapInto(VideoPreview::class);
+
+        return $videos;
     }
 }

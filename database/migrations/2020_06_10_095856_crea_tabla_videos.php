@@ -17,6 +17,7 @@ class CreaTablaVideos extends Migration
             $table->id();
             $table->string('titulo');
             $table->string('url_video');
+            $table->string('thumbnail');
             $table->text('descripcion');
             $table->timestamps();
         });
