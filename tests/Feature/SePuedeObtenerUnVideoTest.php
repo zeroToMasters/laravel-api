@@ -18,6 +18,11 @@ class SePuedeObtenerUnVideoTest extends TestCase
             sprintf(
                 '/api/videos/%s',
                 $video->id
-        ))->assertJsonFragment($video->toArray());
+        ))->assertExactJson([
+            'id' => $video->id,
+            'titulo' => $video->titulo,
+            'descripcion' => $video->descripcion,
+            'url_video' => $video->url_video,
+        ]);
     }
 }

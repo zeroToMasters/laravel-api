@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Video;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class SePuedeObtenerUnListadoDeVideosTest extends TestCase
@@ -20,12 +21,12 @@ class SePuedeObtenerUnListadoDeVideosTest extends TestCase
             ->assertJsonCount(2);
     }
 
-    public function testElPayloadContieneLosVideosEnElSistema()
+    public function testElPreviewDeUnVideoTieneIdYThumbnail()
     {
         $unId = 12345;
         $unThumbnail = 'http://unaimagen.com';
 
-        $video = factory(Video::class)->create([
+        factory(Video::class)->create([
             'id' => $unId,
             'thumbnail' => $unThumbnail,
         ]);
@@ -55,5 +56,21 @@ class SePuedeObtenerUnListadoDeVideosTest extends TestCase
             ->assertJsonPath('0.id', $videoHoy->id)
             ->assertJsonPath('1.id', $videoAyer->id)
             ->assertJsonPath('2.id', $videoHaceUnMes->id);
+    }
+
+    public function testSePuedeLimitarElNumeroDeVideosAObtener()
+    {
+        factory(Video::class, 4)->create();
+
+        $this->getJson('/api/videos?limit=3')
+            ->assertJsonCount(3);
+    }
+
+    public function testDevuelveUnprocessableCuandoElLimitEsUnString()
+    {
+        factory(Video::class, 4)->create();
+
+        $this->getJson('/api/videos?limit=unstring')
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }
