@@ -14,12 +14,12 @@ class ListadoDeVideosRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'limit' => 'integer',
+            'limit' => 'integer|max:50|min:1',
         ];
     }
 
-    public function getLimit()
+    public function getLimit(): int
     {
-        return $this->get('limit');
+        return $this->get('limit', 30);
     }
 }

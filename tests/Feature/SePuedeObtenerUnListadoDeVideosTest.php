@@ -66,11 +66,33 @@ class SePuedeObtenerUnListadoDeVideosTest extends TestCase
             ->assertJsonCount(3);
     }
 
-    public function testDevuelveUnprocessableCuandoElLimitEsUnString()
+    public function testPorDefectoSoliTira30Videos()
     {
-        factory(Video::class, 4)->create();
+        factory(Video::class, 40)->create();
 
-        $this->getJson('/api/videos?limit=unstring')
+        $this->getJson('/api/videos')
+            ->assertJsonCount(30);
+    }
+
+    public function providerLimitesInvalidos(): array
+    {
+        return [
+            'El limite inferior es 1' => [3, '-1'],
+            'No se puede obtener mas de 50 videos' => [51, '51'],
+            'No se puede pasar un limite que sea un string' => [4, 'unstring'],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLimitesInvalidos
+     */
+    public function testDevuelveUnprocessableSiHayErrorEnElLimite(
+        int $numeroDeVideosACrear,
+        string $limite
+    ) {
+        factory(Video::class, $numeroDeVideosACrear)->create();
+
+        $this->getJson(sprintf('/api/videos?limit=%s', $limite))
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }
