@@ -95,4 +95,45 @@ class SePuedeObtenerUnListadoDeVideosTest extends TestCase
         $this->getJson(sprintf('/api/videos?limit=%s', $limite))
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
+
+    public function testPodemosPaginarLosVideos()
+    {
+        factory(Video::class, 9)->create();
+
+        $this->getJson('/api/videos?limit=5&page=2')
+            ->assertJsonCount(4);
+    }
+
+    public function testLaPaginaPorDefectoEsLaPrimera()
+    {
+        factory(Video::class, 9)->create();
+
+        $this->getJson('/api/videos?limit=5')
+            ->assertJsonCount(5);
+    }
+
+    public function testDevuelveCeroVideosCuandoLaPaginaNoExiste()
+    {
+        factory(Video::class, 9)->create();
+
+        $this->getJson('/api/videos?limit=5&page=20')
+            ->assertJsonCount(0);
+    }
+
+    public function proveedorDePagesInvalidas()
+    {
+        return [
+            'No se puede pasar un string como page' => ['unstring'],
+            'La pagina no puede ser menor de 1' => ['0'],
+        ];
+    }
+
+    /**
+     * @dataProvider proveedorDePagesInvalidas
+     */
+    public function testDevuelveUnprocessableSiHayErrorEnLaPage(string $invalidPage)
+    {
+        $this->getJson(sprintf('/api/videos?page=%s', $invalidPage))
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
 }
