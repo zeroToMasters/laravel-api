@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Dtos\VideoPreview;
 use App\Http\Requests\ListadoDeVideosRequest;
+use App\Http\Resources\VideoPreview;
 use App\Video;
 
 class VideosController extends Controller
@@ -15,12 +15,8 @@ class VideosController extends Controller
 
     public function index(ListadoDeVideosRequest $request)
     {
-        $offset = ($request->getPage() - 1) * $request->getLimit();
+        $videos = Video::ultimos($request->getLimit(), $request->getPage())->get();
 
-        return Video::limit($request->getLimit())
-            ->offset($offset)
-            ->orderBy('created_at', 'DESC')
-            ->get()
-            ->mapInto(VideoPreview::class);
+        return VideoPreview::collection($videos);
     }
 }
